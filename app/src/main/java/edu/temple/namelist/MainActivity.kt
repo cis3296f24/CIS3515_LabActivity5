@@ -9,6 +9,7 @@ import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,14 +18,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        names = mutableListOf("Kevin Shaply", "Stacey Lou", "Gerard Clear", "Michael Studdard", "Michelle Studdard")
+        names = mutableListOf(
+            "Kevin Shaply",
+            "Stacey Lou",
+            "Gerard Clear",
+            "Michael Studdard",
+            "Michelle Studdard"
+        )
 
         val spinner = findViewById<Spinner>(R.id.spinner)
         val nameTextView = findViewById<TextView>(R.id.textView)
 
-        with (spinner) {
-            adapter = CustomAdapter(names, this@MainActivity)
-            onItemSelectedListener = object: OnItemSelectedListener {
+
+        with(spinner) {
+            adapter = CustomAdapter(names as MutableList<String>, this@MainActivity)
+            onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                     p0?.run {
                         nameTextView.text = getItemAtPosition(p2).toString()
@@ -37,9 +45,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.deleteButton).setOnClickListener {
-            (names as MutableList).removeAt(spinner.selectedItemPosition)
-            (spinner.adapter as BaseAdapter).notifyDataSetChanged()
+
+            if (names.isNotEmpty()) {
+                (names as MutableList).removeAt(spinner.selectedItemPosition)
+                (spinner.adapter as BaseAdapter).notifyDataSetChanged()
+            }
+            // Reset selection or clear TextView if list is empty
+            if (names.isEmpty()) {
+                nameTextView.text = "No more name"
+                Toast.makeText(this, "No more names available", Toast.LENGTH_SHORT).show()
+            } else {
+                spinner.setSelection(0)
+                nameTextView.text = names[0]
+
+            }
         }
 
+
     }
-}
+    }
+
